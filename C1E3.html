@@ -1,0 +1,553 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Juego de Etiquetas HTML</title>
+
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: Arial, Helvetica, sans-serif;
+        background: #f2efe8;
+        display: flex;
+        justify-content: center;
+        padding: 30px 15px;
+        min-height: 100vh;
+      }
+
+      #game {
+        width: 100%;
+        max-width: 700px;
+      }
+
+      .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+      }
+
+      .title {
+        font-size: 36px;
+        font-weight: bold;
+        color: #2b2460;
+      }
+
+      .stats {
+        display: flex;
+        gap: 10px;
+      }
+
+      .box {
+        background: #ece9ff;
+        padding: 12px 18px;
+        border-radius: 10px;
+        color: #4f46b8;
+        font-weight: bold;
+      }
+
+      .progress {
+        width: 100%;
+        height: 8px;
+        background: #ddd;
+        border-radius: 999px;
+        overflow: hidden;
+        margin-bottom: 20px;
+      }
+
+      .progress-bar {
+        width: 0%;
+        height: 100%;
+        background: #6a5cff;
+        transition: 0.3s;
+      }
+
+      .card {
+        background: white;
+        border: 2px solid #d9d5ff;
+        border-radius: 18px;
+        padding: 25px;
+      }
+
+      .question {
+        font-size: 17px;
+        line-height: 1.5;
+        color: #555;
+        margin-bottom: 20px;
+      }
+
+      .code {
+        background: #f6f4ef;
+        border: 1px solid #d8d4cc;
+        border-radius: 10px;
+        padding: 18px;
+        font-family: monospace;
+        line-height: 2;
+        white-space: pre-wrap;
+        margin-bottom: 20px;
+        overflow-x: auto;
+      }
+
+      .blank {
+        display: inline-block;
+        background: #ece9ff;
+        border: 2px dashed #6a5cff;
+        border-radius: 6px;
+        padding: 2px 10px;
+        color: #4f46b8;
+        min-width: 70px;
+        text-align: center;
+        font-size: 13px;
+      }
+
+      .input-area {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 15px;
+      }
+
+      input {
+        flex: 1;
+        height: 45px;
+        border-radius: 10px;
+        border: 2px solid #d9d5ff;
+        padding: 0 15px;
+        font-size: 16px;
+        font-family: monospace;
+      }
+
+      button {
+        border: none;
+        background: #5a4cf0;
+        color: white;
+        padding: 0 20px;
+        border-radius: 10px;
+        cursor: pointer;
+        font-weight: bold;
+        transition: 0.2s;
+      }
+
+      button:hover {
+        background: #4638d6;
+      }
+
+      .feedback {
+        display: none;
+        margin-top: 10px;
+        padding: 12px;
+        border-radius: 10px;
+        font-weight: bold;
+      }
+
+      .correct {
+        background: #ddf7e7;
+        color: #0b6d42;
+        display: block;
+      }
+
+      .wrong {
+        background: #ffe1e1;
+        color: #8d1f1f;
+        display: block;
+      }
+
+      .chips {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 20px;
+      }
+
+      .chip {
+        background: #ece9ff;
+        color: #4f46b8;
+        padding: 5px 10px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-family: monospace;
+        font-size: 13px;
+        transition: 0.2s;
+      }
+
+      .chip:hover {
+        background: #d7d2ff;
+      }
+
+      .next {
+        margin-top: 15px;
+        display: none;
+      }
+
+      .end-screen {
+        display: none;
+        text-align: center;
+        padding: 40px 20px;
+      }
+
+      .end-title {
+        font-size: 52px;
+        font-weight: bold;
+        margin-bottom: 15px;
+      }
+
+      .end-text {
+        font-size: 18px;
+        color: #555;
+        margin-bottom: 25px;
+      }
+
+      .lives {
+        display: flex;
+        gap: 5px;
+        font-size: 20px;
+      }
+
+      .lost {
+        opacity: 0.25;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div id="game">
+      <div class="header">
+        <div class="title">Etiquetas HTML</div>
+
+        <div class="stats">
+          <div class="box">
+            Puntos:
+            <span id="score">0</span>
+          </div>
+
+          <div class="box">
+            <div class="lives" id="lives"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="progress">
+        <div class="progress-bar" id="progress"></div>
+      </div>
+
+      <div id="play-screen">
+        <div class="card">
+          <div class="question" id="question"></div>
+
+          <div class="code" id="code"></div>
+
+          <div class="input-area">
+            <input type="text" id="answer" placeholder="Escribe la etiqueta" />
+
+            <button onclick="checkAnswer()">Verificar</button>
+          </div>
+
+          <div id="feedback" class="feedback"></div>
+
+          <div class="chips" id="chips"></div>
+
+          <button class="next" id="nextBtn" onclick="nextQuestion()">
+            Siguiente
+          </button>
+        </div>
+      </div>
+
+      <div class="end-screen" id="endScreen">
+        <div class="end-title" id="endTitle"></div>
+
+        <div class="end-text" id="endText"></div>
+
+        <button onclick="restartGame()">Jugar otra vez</button>
+      </div>
+    </div>
+
+    <script>
+      const ALL_TAGS = [
+        "html",
+        "head",
+        "body",
+        "title",
+        "h1",
+        "h2",
+        "h3",
+        "p",
+        "br",
+        "hr",
+        "b",
+        "i",
+      ];
+
+      const questions = [
+        {
+          desc: "Define el título principal de la página.",
+          template: "<___>Bienvenido</___>",
+          answer: "h1",
+        },
+
+        {
+          desc: "Crea un párrafo.",
+          template: "<___>Hola mundo</___>",
+          answer: "p",
+        },
+
+        {
+          desc: "Inserta una línea horizontal.",
+          template: "<h2>Inicio</h2>\n<___>",
+          answer: "hr",
+        },
+
+        {
+          desc: "Haz que el texto aparezca en negrita.",
+          template: "<___>Importante</___>",
+          answer: "b",
+        },
+
+        {
+          desc: "Haz que el texto aparezca en cursiva.",
+          template: "<___>Texto</___>",
+          answer: "i",
+        },
+
+        {
+          desc: "Inserta un salto de línea.",
+          template: "Hola<___>Mundo",
+          answer: "br",
+        },
+
+        {
+          desc: "Define el título de la pestaña del navegador.",
+          template: "<___>Mi página</___>",
+          answer: "title",
+        },
+
+        {
+          desc: "Contiene el contenido visible de la página.",
+          template: "<___>\n<h1>Hola</h1>\n</___>",
+          answer: "body",
+        },
+
+        {
+          desc: "Contiene los metadatos del documento.",
+          template: "<___>\n<title>Web</title>\n</___>",
+          answer: "head",
+        },
+
+        {
+          desc: "Etiqueta raíz del documento HTML.",
+          template: "<___>\n<body></body>\n</___>",
+          answer: "html",
+        },
+      ];
+
+      let current = 0;
+      let score = 0;
+      let lives = 3;
+      let answered = false;
+      let shuffled = [];
+
+      function shuffle(array) {
+        return [...array].sort(() => Math.random() - 0.5);
+      }
+
+      function renderLives() {
+        const container = document.getElementById("lives");
+
+        container.innerHTML = "";
+
+        for (let i = 0; i < 3; i++) {
+          const heart = document.createElement("span");
+
+          heart.innerHTML = "❤";
+
+          if (i >= lives) {
+            heart.classList.add("lost");
+          }
+
+          container.appendChild(heart);
+        }
+      }
+
+      function escapeHTML(text) {
+        return text.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+      }
+
+      function buildCode(template, reveal) {
+        let safe = escapeHTML(template);
+
+        if (reveal) {
+          return safe.replace(
+            /___/g,
+            `<span style="color:#5a4cf0;font-weight:bold;">
+        ${shuffled[current].answer}
+      </span>`,
+          );
+        }
+
+        return safe.replace(/___/g, `<span class="blank">etiqueta</span>`);
+      }
+
+      function renderQuestion() {
+        answered = false;
+
+        const q = shuffled[current];
+
+        document.getElementById("question").textContent = q.desc;
+
+        document.getElementById("code").innerHTML = buildCode(
+          q.template,
+          false,
+        );
+
+        document.getElementById("feedback").style.display = "none";
+
+        document.getElementById("feedback").className = "feedback";
+
+        document.getElementById("answer").value = "";
+
+        document.getElementById("nextBtn").style.display = "none";
+
+        document.getElementById("progress").style.width =
+          (current / shuffled.length) * 100 + "%";
+
+        renderLives();
+
+        renderChips();
+      }
+
+      function renderChips() {
+        const chips = document.getElementById("chips");
+
+        chips.innerHTML = "";
+
+        ALL_TAGS.forEach((tag) => {
+          const chip = document.createElement("div");
+
+          chip.className = "chip";
+
+          chip.innerHTML = `&lt;${tag}&gt;`;
+
+          chip.onclick = () => {
+            if (!answered) {
+              document.getElementById("answer").value = tag;
+            }
+          };
+
+          chips.appendChild(chip);
+        });
+      }
+
+      function checkAnswer() {
+        if (answered) return;
+
+        answered = true;
+
+        const input = document
+          .getElementById("answer")
+          .value.trim()
+          .toLowerCase()
+          .replace(/[<>/]/g, "");
+
+        const q = shuffled[current];
+
+        const feedback = document.getElementById("feedback");
+
+        document.getElementById("code").innerHTML = buildCode(q.template, true);
+
+        if (input === q.answer) {
+          score += 10;
+
+          document.getElementById("score").textContent = score;
+
+          feedback.className = "feedback correct";
+
+          feedback.innerHTML = `✔ Correcto. La respuesta es &lt;${q.answer}&gt;`;
+        } else {
+          lives--;
+
+          renderLives();
+
+          feedback.className = "feedback wrong";
+
+          feedback.innerHTML = `✘ Incorrecto. La respuesta correcta es &lt;${q.answer}&gt;`;
+        }
+
+        feedback.style.display = "block";
+
+        if (lives <= 0) {
+          setTimeout(showLose, 800);
+
+          return;
+        }
+
+        if (current >= shuffled.length - 1) {
+          setTimeout(showWin, 800);
+
+          return;
+        }
+
+        document.getElementById("nextBtn").style.display = "inline-block";
+      }
+
+      function nextQuestion() {
+        current++;
+
+        renderQuestion();
+      }
+
+      function showLose() {
+        document.getElementById("play-screen").style.display = "none";
+
+        document.getElementById("endScreen").style.display = "block";
+
+        document.getElementById("endTitle").textContent = "❌ PERDISTE";
+
+        document.getElementById("endText").textContent =
+          "Te quedaste sin vidas.";
+      }
+
+      function showWin() {
+        document.getElementById("play-screen").style.display = "none";
+
+        document.getElementById("endScreen").style.display = "block";
+
+        document.getElementById("endTitle").textContent = "🏆 GANASTE";
+
+        document.getElementById("endText").textContent =
+          "Respondiste correctamente las 10 preguntas.";
+      }
+
+      function restartGame() {
+        current = 0;
+        score = 0;
+        lives = 3;
+
+        shuffled = shuffle(questions);
+
+        document.getElementById("score").textContent = "0";
+
+        document.getElementById("play-screen").style.display = "block";
+
+        document.getElementById("endScreen").style.display = "none";
+
+        renderQuestion();
+      }
+
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") {
+          if (!answered) {
+            checkAnswer();
+          } else {
+            nextQuestion();
+          }
+        }
+      });
+
+      restartGame();
+    </script>
+  </body>
+</html>
